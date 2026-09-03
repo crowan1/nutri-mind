@@ -1,0 +1,29 @@
+# Normalise les fins de ligne en LF dans le depot.
+# Sans cela, un poste Windows commite du CRLF et un poste WSL/Linux du LF :
+# les fichiers apparaissent modifies alors que le contenu est identique.
+* text=auto eol=lf
+
+# Scripts Windows : doivent conserver CRLF pour rester executables.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binaires : aucune conversion, jamais.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.sqlite binary
+
+# Pilotes de diff (le backend a les siens dans backend/.gitattributes).
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
