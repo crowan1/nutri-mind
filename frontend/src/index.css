@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+/* Palette de Nutri'Mind. Tailwind 4 derive automatiquement les utilitaires
+   de ces variables : bg-page, text-ink, text-muted, border-line, text-brand,
+   bg-brand-soft, bg-mint, text-danger, bg-night. */
+@theme {
+  --color-page: #f9f9f6;
+  --color-ink: #14140f;
+  --color-muted: #6b6b60;
+  --color-line: #e6e6df;
+  --color-brand: #16a34a;
+  --color-brand-soft: #e7f4ec;
+  --color-mint: #edf5ef;
+  --color-danger: #e33a2e;
+  --color-night: #0d120e;
+
+  /* Slow looping drift for the hero's floating cards. The two cards are put
+     out of phase with a negative animation-delay. */
+  --animate-float: float 7s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -0.4rem;
+    }
+  }
+}
