@@ -14,11 +14,14 @@ class RegisteredUserController extends Controller
     public function store(RegisterRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $emailLocal = Str::before($validated['email'], '@');
+        $hasNameParts = Str::contains($emailLocal, '.');
 
         $user = User::create([
-            'name' => Str::before($validated['email'], '@'),
+            'first_name' => $hasNameParts ? Str::before($emailLocal, '.') : $emailLocal,
+            'last_name' => $hasNameParts ? Str::after($emailLocal, '.') : '',
             'email' => $validated['email'],
-            'password' => $validated['password'],
+            'password' => bcrypt($validated['password']),
         ]);
 
         Auth::login($user);
