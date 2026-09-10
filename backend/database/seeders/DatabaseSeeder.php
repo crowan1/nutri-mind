@@ -2,6 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UnitType;
+use App\Models\Ingredient;
+use App\Models\Recipe;
+use App\Models\RecipeIngredient;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,11 +20,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $users = User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $recipes = Recipe::factory(30)->recycle($users)->create();
+        $ingredients = Ingredient::factory(30)->create();
+
+        $allUnits = UnitType::values();
+        $units = Unit::factory()->count(count($allUnits))->sequence(...array_map(fn($name) => ['name' => $name], $allUnits))->create();
+
+        RecipeIngredient::factory(50)
+            ->recycle($recipes)
+            ->recycle($ingredients)
+            ->recycle($units)
+            ->create();
     }
 }
