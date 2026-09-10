@@ -15,7 +15,6 @@ class UserController extends Controller
     {
         try {
             $users = User::all();
-
             return new SuccessResponse(200, 'Users found successfully.', $users)->send();
         } catch (Throwable $e) {
             return new ErrorResponse($e->getCode(), $e->getMessage())->send();
@@ -62,9 +61,27 @@ class UserController extends Controller
         }
     }
 
-    public function editUser(int $user_id)
+    public function editUser(Request $request, int $user_id)
     {
         $user = User::find($user_id);
+
+        if (!$user) {
+            return (new ErrorResponse(404, 'User not found.'))->send();
+        }
+
+        $validated = $request->validate(
+            [
+                'first_name' => ['sometimes', 'string', 'max:100'],
+                'last_name' => ['sometimes', 'string', 'max:100'],
+                'email' => ['sometimes', 'email', 'unique:users,email,' . $user_id],
+                'password' => ['nullable', 'min:8'],
+                'password_validation' => ['required_with:password', 'same:password']
+            ],
+            [
+                'email.unique' => 'Cet email est déjà utilisé.',
+                'password_validation.same' => 'Les mots de passe ne correspondent pas.'
+            ]
+        );
     }
 
     public function deleteUser(int $user_id)
