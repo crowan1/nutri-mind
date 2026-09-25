@@ -8,7 +8,7 @@ function AuthPanel({ mode, onLeft }) {
 
   return (
     <aside
-      className={`flex min-h-[22rem] flex-col bg-brand p-6 text-white transition-transform duration-500 ease-in-out motion-reduce:transition-none sm:min-h-[24rem] sm:p-8 lg:absolute lg:inset-y-0 lg:left-0 lg:z-10 lg:h-full lg:min-h-0 lg:w-1/2 lg:p-10 ${
+      className={`flex min-h-[22rem] flex-col bg-brand p-6 text-white transition-transform duration-300 ease-in-out motion-reduce:transition-none sm:min-h-[24rem] sm:p-8 lg:absolute lg:inset-y-0 lg:left-0 lg:z-10 lg:h-full lg:min-h-0 lg:w-1/2 lg:p-10 ${
         onLeft ? 'lg:translate-x-0' : 'lg:translate-x-full'
       } ${isLogin ? 'order-2' : 'order-1'} lg:order-none`}
     >
@@ -44,9 +44,9 @@ function AuthPanel({ mode, onLeft }) {
 function FormColumn({ isLogin, faded, children }) {
   return (
     <div
-      className={`flex h-full flex-col p-6 transition-opacity duration-500 ease-out motion-reduce:transition-none sm:p-8 lg:p-10 ${
+      className={`flex h-full flex-col p-6 transition-opacity duration-300 ease-out motion-reduce:transition-none sm:p-8 lg:p-10 ${
         isLogin ? 'order-1 lg:col-start-1' : 'order-2 lg:col-start-2'
-      } ${faded ? 'lg:opacity-0' : 'lg:delay-150'}`}
+      } ${faded ? 'lg:opacity-0' : 'lg:delay-100'}`}
     >
       {children}
     </div>
