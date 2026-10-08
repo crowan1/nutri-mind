@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -40,3 +41,6 @@ Route::get('/recipe/{id}', [RecipeController::class, 'getRecipeById']);
 Route::post('/recipes', [RecipeController::class, 'addRecipe']);
 Route::put('/recipe/{id}', [RecipeController::class, 'editRecipe']);
 Route::delete('/recipe/{id}', [RecipeController::class, 'deleteRecipe']);
+
+Route::get('/tags', [TagController::class, 'getAllTags']);
+Route::get('/tag/{id}', [TagController::class, 'getTagById']);
