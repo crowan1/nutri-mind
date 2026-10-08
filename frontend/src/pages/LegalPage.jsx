@@ -4,9 +4,6 @@ import LegalLayout, { INLINE_LINK } from '../components/LegalLayout'
 import { PUBLISHER } from '../legalEntity'
 import { routes } from '../routes'
 
-// Legal notice. Baseline text following article 6-III of the French LCEN,
-// to be reviewed by a lawyer before going live.
-
 const INTRO =
   "Informations relatives à l'éditeur de ce site, à son hébergement et aux conditions de réutilisation de son contenu."
 

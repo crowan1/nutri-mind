@@ -12,6 +12,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import PrivacyPage from './pages/PrivacyPage'
 import RegisterPage from './pages/RegisterPage'
 import TermsPage from './pages/TermsPage'
+import RecipesPage from './pages/RecipesPage'
 import { routes } from './routes'
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path={routes.dashboard} element={<DashboardPage />} />
+          <Route path={routes.recipes} element={<RecipesPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

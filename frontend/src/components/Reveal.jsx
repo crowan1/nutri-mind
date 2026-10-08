@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-// Fades its content in the first time it enters the viewport. Animating on
-// mount instead would not work: sections further down the page would play
-// off-screen and be frozen by the time the reader scrolls to them.
-//
-// `as` avoids a wrapper div when the animated element is the content itself,
-// `delay` staggers elements of the same block, and any other prop lands on the
-// rendered element (id, aria-label...).
 export default function Reveal({ as: Tag = 'div', className = '', delay = 0, children, ...rest }) {
   const ref = useRef(null)
   const [shown, setShown] = useState(false)
@@ -19,8 +12,6 @@ export default function Reveal({ as: Tag = 'div', className = '', delay = 0, chi
         // Once is enough: the animation should not replay on every pass.
         self.disconnect()
       },
-      // Slight bottom inset so it fires once the element is properly in view,
-      // not on its first row of pixels.
       { rootMargin: '0px 0px -12% 0px' },
     )
 
