@@ -4,6 +4,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +23,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 });
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/users', [UserController::class, 'getAllUsers']);
+Route::get('/user/{id}', [UserController::class, 'getUserById']);
+Route::post('/users', [UserController::class, 'addUser']);
+Route::put('/user/{id}', [UserController::class, 'editUser']);
+Route::delete('/user/{id}', [UserController::class, 'deleteUser']);
+Route::get('/user/{id}/recipes', [UserController::class, 'getRecipes']);
+
+Route::get('/recipes', [RecipeController::class, 'getAllRecipes']);
+Route::get('/recipe/{id}', [RecipeController::class, 'getRecipeById']);
+Route::post('/recipes', [RecipeController::class, 'addRecipe']);
+Route::put('/recipe/{id}', [RecipeController::class, 'editRecipe']);
+Route::delete('/recipe/{id}', [RecipeController::class, 'deleteRecipe']);
