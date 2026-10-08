@@ -23,7 +23,7 @@ class RecipeController
     public function getRecipeById(int $id)
     {
         try {
-            $recipe = Recipe::findOrFail($id);
+            $recipe = Recipe::with('tags')->findOrFail($id);
             return new SuccessResponse(200, 'Recipe found successfully', $recipe)->send();
         } catch (Throwable $e) {
             return new ErrorResponse($e->getCode(), $e->getMessage())->send();

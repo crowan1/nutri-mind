@@ -20,8 +20,10 @@ class RecipeFactory extends Factory
     {
         return [
             'name' => fake()->text(30),
+            'description' => fake()->text(100),
             'difficulty' => fake()->randomElement(['facile', 'intermédiaire', 'difficile']),
             'peopleNb' => fake()->numberBetween(1, 10),
+            'duration' => fake()->numberBetween(5, 120),
             'isFavorite' => fake()->boolean(),
             'user_id' => User::factory()
         ];

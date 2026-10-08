@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Table('recipes')]
-#[Fillable('name', 'difficulty', 'peopleNb', 'isFavorite', 'user_id')]
+#[Fillable('name', 'description', 'difficulty', 'peopleNb', 'isFavorite', 'duration', 'user_id')]
 class Recipe extends Model
 {
     use HasFactory;
@@ -23,5 +23,10 @@ class Recipe extends Model
     public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredient::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'recipe_tags');
     }
 }

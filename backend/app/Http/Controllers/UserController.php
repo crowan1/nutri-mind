@@ -97,7 +97,7 @@ class UserController
 
     public function deleteUser(int $id)
     {
-        $user = User::find($id);
+        $user = User::with('tags')->find($id);
 
         if (!$user) {
             return (new ErrorResponse(404, 'User not found.'))->send();
@@ -120,10 +120,10 @@ class UserController
         }
 
         try {
-            $recipes = $user->recipes();
+            $recipes = $user->recipes()->with('tags')->get();
             return (new SuccessResponse(200, 'Recipes found successfully.', $recipes))->send();
         } catch (Throwable $e) {
-            return (new ErrorResponse($e->getCode(), $e->getMessage()));
+            return (new ErrorResponse($e->getCode(), $e->getMessage()))->send();
         }
     }
 }

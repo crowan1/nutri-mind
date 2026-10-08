@@ -23,7 +23,7 @@ class SuccessResponse
             'code' => $this->code,
             'success' => $this->success,
             'message' => $this->message,
-            'response' => json_decode($this->data)
+            'data' => json_decode($this->data)
         ]);
     }
 }
