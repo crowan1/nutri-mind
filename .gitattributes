@@ -1,0 +1,12 @@
+# The frontend has no .editorconfig, so a Windows editor rewrote the whole tree
+# from LF to CRLF and every file showed up as fully rewritten. Normalising here
+# keeps the repository on LF whatever each machine does locally.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
