@@ -13,6 +13,9 @@ export const routes = {
   inventory: '/inventory',
   recipes: '/recipes',
   recipeDetail: '/recipes/:id',
+  planning: '/planning',
+  health: '/health',
+  profile: '/profile',
   pricing: '/pricing',
 
   // Ressources
