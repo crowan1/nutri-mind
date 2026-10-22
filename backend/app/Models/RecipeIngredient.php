@@ -12,6 +12,12 @@ class RecipeIngredient extends Pivot
 
     protected $table = 'recipe_ingredient';
 
+    // The table carries its own auto-incrementing id, which a Pivot assumes
+    // it does not have.
+    public $incrementing = true;
+
+    protected $fillable = ['recipe_id', 'ingredient_id', 'unit_id', 'quantity'];
+
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
