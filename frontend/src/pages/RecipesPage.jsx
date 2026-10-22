@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import RecipeCard from '../components/recipes/RecipeCard'
+import RecipeCardSkeleton from '../components/recipes/RecipeCardSkeleton'
 import Reveal from '../components/Reveal'
+import Skeleton from '../components/Skeleton'
 import { useAuth } from '../context/AuthContext'
 import { fetchTags, fetchUserRecipes } from '../lib/api'
 import { recipePath } from '../routes'
@@ -16,8 +18,8 @@ export default function RecipesPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
-  const [recipes, setRecipes] = useState([])
-  const [tags, setTags] = useState([])
+  const [recipes, setRecipes] = useState(null)
+  const [tags, setTags] = useState(null)
   const [selectedTagIds, setSelectedTagIds] = useState([])
   const [searchedTerm, setSearchedTerm] = useState('')
 
@@ -31,7 +33,10 @@ export default function RecipesPage() {
         if (!cancelled) setRecipes(response.data ?? [])
       })
       .catch(() => {
-        if (!cancelled) showErrorToast('Erreur lors de la récupération des recettes.')
+        if (!cancelled) {
+          setRecipes([])
+          showErrorToast('Erreur lors de la récupération des recettes.')
+        }
       })
 
     // The user can log out while the request is in flight; dropping the
@@ -49,7 +54,10 @@ export default function RecipesPage() {
         if (!cancelled) setTags(response.data ?? [])
       })
       .catch(() => {
-        if (!cancelled) showErrorToast('Erreur lors de la récupération des tags.')
+        if (!cancelled) {
+          setTags([])
+          showErrorToast('Erreur lors de la récupération des tags.')
+        }
       })
 
     return () => {
@@ -68,7 +76,7 @@ export default function RecipesPage() {
   const filteredRecipes = useMemo(() => {
     const cleanSearch = searchedTerm.trim().toLowerCase()
 
-    return recipes.filter((recipe) => {
+    return (recipes ?? []).filter((recipe) => {
       const matchesSearch =
         cleanSearch === '' ||
         recipe.name?.toLowerCase().includes(cleanSearch) ||
@@ -84,12 +92,20 @@ export default function RecipesPage() {
   // Only the tags actually carried by the user's recipes are worth offering:
   // the full list is ~50 entries and most would filter down to nothing.
   const availableTags = useMemo(() => {
-    const usedTagIds = new Set(recipes.flatMap((recipe) => (recipe.tags ?? []).map((tag) => tag.id)))
-    return tags.filter((tag) => usedTagIds.has(tag.id))
+    const usedTagIds = new Set(
+      (recipes ?? []).flatMap((recipe) => (recipe.tags ?? []).map((tag) => tag.id)),
+    )
+    return (tags ?? []).filter((tag) => usedTagIds.has(tag.id))
   }, [tags, recipes])
 
+  // Null means the request is still in flight; an empty array means it came
+  // back with nothing. Telling them apart is what stops the page flashing
+  // "aucune recette" before the first one has had a chance to arrive.
+  const loadingRecipes = recipes === null
+  const loadingTags = tags === null
+
   return (
-    <section className="border-b border-line px-6 py-14 sm:px-10 sm:py-16 lg:px-16">
+    <section>
       <Reveal as="h1" className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
         Mes recettes
       </Reveal>
@@ -108,7 +124,15 @@ export default function RecipesPage() {
         />
       </Reveal>
 
-      {availableTags.length > 0 && (
+      {(loadingRecipes || loadingTags) && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {['w-16', 'w-24', 'w-14', 'w-20', 'w-16'].map((width, index) => (
+            <Skeleton key={index} className={`h-7 rounded-full ${width}`} />
+          ))}
+        </div>
+      )}
+
+      {!loadingTags && availableTags.length > 0 && (
         <Reveal delay={160} className="mt-5 flex flex-wrap gap-2">
           {availableTags.map((tag) => {
             const active = selectedTagIds.includes(tag.id)
@@ -132,7 +156,17 @@ export default function RecipesPage() {
         </Reveal>
       )}
 
-      {filteredRecipes.length > 0 ? (
+      {loadingRecipes ? (
+        <div
+          role="status"
+          aria-label="Chargement de vos recettes"
+          className="mt-10 grid justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        >
+          {Array.from({ length: 4 }, (_, index) => (
+            <RecipeCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : filteredRecipes.length > 0 ? (
         <div className="mt-10 grid justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredRecipes.map((recipe) => (
             <RecipeCard

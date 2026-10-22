@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import Reveal from '../components/Reveal'
+import Skeleton from '../components/Skeleton'
 import { fetchRecipe } from '../lib/api'
 import { routes } from '../routes'
 import usePageTitle from '../usePageTitle'
@@ -45,7 +46,7 @@ export default function RecipeDetailPage() {
 
   if (error) {
     return (
-      <section className="px-6 py-20 text-center sm:px-10">
+      <section className="py-16 text-center">
         <Reveal as="h1" className="text-2xl font-bold text-ink">
           {error === 404 ? "Cette recette n'existe pas." : 'Recette indisponible.'}
         </Reveal>
@@ -68,8 +69,38 @@ export default function RecipeDetailPage() {
 
   if (!recipe) {
     return (
-      <section className="px-6 py-20 sm:px-10">
-        <p className="text-sm text-muted">Chargement…</p>
+      <section role="status" aria-label="Chargement de la recette">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="mt-4 h-9 w-2/3 max-w-md" />
+
+        <div className="mt-6 flex flex-wrap gap-8">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-4 w-28" />
+        </div>
+
+        <div className="mt-5 flex gap-2">
+          <Skeleton className="h-7 w-20 rounded-full" />
+          <Skeleton className="h-7 w-28 rounded-full" />
+        </div>
+
+        <div className="mt-8 flex max-w-2xl flex-col gap-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-11/12" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+
+        <div className="mt-10 max-w-xl">
+          <Skeleton className="h-5 w-32" />
+          <div className="mt-4 divide-y divide-line rounded-2xl border border-line bg-white">
+            {Array.from({ length: 3 }, (_, index) => (
+              <div key={index} className="flex items-center justify-between px-5 py-3.5">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     )
   }
@@ -77,7 +108,7 @@ export default function RecipeDetailPage() {
   const ingredients = recipe.recipe_ingredients ?? []
 
   return (
-    <section className="border-b border-line px-6 py-14 sm:px-10 sm:py-16 lg:px-16">
+    <section>
       <Reveal as="p" className="text-sm font-medium text-brand">
         <Link to={routes.recipes} className="hover:underline">
           ← Mes recettes
