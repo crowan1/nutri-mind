@@ -1,5 +1,4 @@
-import React from 'react';
-import { capitalize, formatDuration } from '../../utils/Format';
+import { capitalize, formatDuration } from '../../utils/Format'
 
 export default function RecipeCard({
     recipe = {},
@@ -9,23 +8,16 @@ export default function RecipeCard({
     onViewClick = () => { },
     imageSrc = ""
 }) {
-    const {
-        name = recipe.name,
-        duration = recipe.duration,
-        peopleNb = recipe.peopleNb,
-        difficulty = recipe.difficulty,
-        description = "",
-        tags = recipe.tags
-    } = recipe;
+    const { name, duration, peopleNb, difficulty, description, tags } = recipe;
 
     const percentage = totalIngredients > 0
         ? Math.round((ownedIngredients / totalIngredients) * 100)
         : 0;
 
     return (
-        <div className="w-[320px] bg-white rounded-3xl p-5 shadow-sm border border-gray-100 font-sans flex flex-col justify-between transition-all hover:shadow-md">
+        <div className="w-[320px] bg-white rounded-3xl p-5 shadow-sm border border-line font-sans flex flex-col justify-between transition-all hover:shadow-md">
             {/* Zone supérieure (Header / Badge / Image) */}
-            <div className="relative min-h-[140px] mb-4 rounded-2xl overflow-hidden bg-gray-50">
+            <div className="relative min-h-[140px] mb-4 rounded-2xl overflow-hidden bg-mint">
                 {imageSrc && (
                     <img
                         src={imageSrc}
@@ -35,7 +27,7 @@ export default function RecipeCard({
                 )}
                 {/* Badge Anti-gaspi */}
                 <div className="absolute top-0 left-0">
-                    <span className="inline-block bg-[#10a34a] text-white text-xs font-medium px-3.5 py-1.5 rounded-full shadow-sm">
+                    <span className="inline-block bg-brand text-white text-xs font-medium px-3.5 py-1.5 rounded-full shadow-sm">
                         {badgeText}
                     </span>
                 </div>
@@ -44,19 +36,19 @@ export default function RecipeCard({
             {/* Contenu principal */}
             <div className="flex-1">
                 {/* Titre */}
-                <h2 className="text-xl font-semibold text-gray-900 mb-3 tracking-tight">
+                <h2 className="text-xl font-semibold text-ink mb-3 tracking-tight">
                     {name}
                 </h2>
 
                 {/* Métadonnées : Temps, Portions, Difficulté */}
-                <div className="flex items-center gap-6 text-xs font-medium text-gray-600 mb-3">
+                <div className="flex items-center gap-6 text-xs font-medium text-muted mb-3">
                     <span>{formatDuration(duration)}</span>
                     <span>{peopleNb} pers.</span>
                     <span>{capitalize(difficulty)}</span>
                 </div>
 
                 {description && (
-                    <p className="text-xs text-gray-500 leading-relaxed mb-4">
+                    <p className="text-xs text-muted leading-relaxed mb-4">
                         {description}
                     </p>
                 )}
@@ -65,7 +57,7 @@ export default function RecipeCard({
                     {tags && tags.length > 0 && tags.map((tag) => (
                         <span
                             key={tag.id}
-                            className="inline-block bg-gray-50 text-gray-700 text-xs px-3 py-1 rounded-full border border-gray-200/80 font-medium"
+                            className="inline-block bg-mint text-ink text-xs px-3 py-1 rounded-full border border-line font-medium"
                         >
                             {capitalize(tag.name)}
                         </span>
@@ -75,17 +67,17 @@ export default function RecipeCard({
             </div>
 
             {/* Séparateur & Pied de carte */}
-            <div className="pt-3 border-t border-gray-100 flex items-end justify-between">
+            <div className="pt-3 border-t border-line flex items-end justify-between">
                 {/* Section Ingrédients & Barre de progression */}
                 <div className="flex flex-col gap-1.5 flex-1 pr-4">
-                    <p className="text-xs text-gray-500">
-                        <span className="text-[#10a34a] font-bold">{ownedIngredients}/{totalIngredients}</span> ingrédients chez vous
+                    <p className="text-xs text-muted">
+                        <span className="text-brand font-bold">{ownedIngredients}/{totalIngredients}</span> ingrédients chez vous
                     </p>
 
                     {/* Barre de progression */}
-                    <div className="w-32 h-1.5 bg-emerald-50 rounded-full overflow-hidden">
+                    <div className="w-32 h-1.5 bg-brand-soft rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-[#10a34a] rounded-full transition-all duration-300"
+                            className="h-full bg-brand rounded-full transition-all duration-300"
                             style={{ width: `${percentage}%` }}
                         />
                     </div>
@@ -94,7 +86,7 @@ export default function RecipeCard({
                 {/* Bouton Voir */}
                 <button
                     onClick={onViewClick}
-                    className="text-[#10a34a] font-medium text-sm hover:underline focus:outline-none"
+                    className="text-brand font-medium text-sm hover:underline focus:outline-none"
                 >
                     Voir
                 </button>

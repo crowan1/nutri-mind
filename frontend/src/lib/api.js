@@ -70,3 +70,11 @@ export async function sendPasswordResetLink(email) {
     body: JSON.stringify({ email }),
   })
 }
+
+export async function fetchUserRecipes(userId) {
+  return request(`/user/${userId}/recipes`)
+}
+
+export async function fetchTags() {
+  return request('/tags')
+}

@@ -1,81 +1,143 @@
-import axios from 'axios'
+import { useEffect, useMemo, useState } from 'react'
+
+import RecipeCard from '../components/recipes/RecipeCard'
+import Reveal from '../components/Reveal'
 import { useAuth } from '../context/AuthContext'
-import { useEffect, useMemo, useState } from 'react';
-import { showErrorToast, showSuccessToast } from '../utils/Toast';
-import RecipeCard from '../components/recipes/RecipeCard';
+import { fetchTags, fetchUserRecipes } from '../lib/api'
+import usePageTitle from '../usePageTitle'
+import { capitalize } from '../utils/Format'
+import { showErrorToast } from '../utils/Toast'
 
 export default function RecipesPage() {
+  usePageTitle('Mes recettes')
 
-    const { user } = useAuth();
-    const API_URL = import.meta.env.VITE_API_URL
+  const { user } = useAuth()
 
-    const [recipes, setRecipes] = useState([]);
-    const [tags, setTags] = useState([]);
-    const [searchedTerm, setSearchedTerm] = useState('');
+  const [recipes, setRecipes] = useState([])
+  const [tags, setTags] = useState([])
+  const [selectedTagIds, setSelectedTagIds] = useState([])
+  const [searchedTerm, setSearchedTerm] = useState('')
 
-    // on récupère toutes les recettes de l'utilisateur connecté
-    const getUserRecipes = async () => {
-        if (!user?.id) return;
-        try {
-            await axios.get(API_URL + 'user/' + user.id + '/recipes').then(response => {
-                setRecipes(response.data.data);
-            });
-        } catch (error) {
-            console.error("Erreur lors de la récupération des recettes", error);
-            showErrorToast("Error lors de la récupération des recettes.")
-        }
+  useEffect(() => {
+    if (!user?.id) return
+
+    let cancelled = false
+
+    fetchUserRecipes(user.id)
+      .then((response) => {
+        if (!cancelled) setRecipes(response.data ?? [])
+      })
+      .catch(() => {
+        if (!cancelled) showErrorToast('Erreur lors de la récupération des recettes.')
+      })
+
+    // The user can log out while the request is in flight; dropping the
+    // response then avoids setting state on an unmounted page.
+    return () => {
+      cancelled = true
     }
+  }, [user?.id])
 
-    useEffect(() => {
-        getUserRecipes();
-    }, [user?.id]);
+  useEffect(() => {
+    let cancelled = false
 
-    useEffect(() => {
-        const fetchTags = async () => {
-            try {
-                await axios.get(API_URL + 'tags').then(response => {
-                    setTags(response.data.data);
-                });
-            } catch (error) {
-                console.log("Error lors de la récupération des tags des recettes.", error);
-                showErrorToast("Error lors de la récupération des tags des recettes.");
-            }
-        }
-        fetchTags();
-    }, [API_URL]);
+    fetchTags()
+      .then((response) => {
+        if (!cancelled) setTags(response.data ?? [])
+      })
+      .catch(() => {
+        if (!cancelled) showErrorToast('Erreur lors de la récupération des tags.')
+      })
 
-    // filtre les recettes sur le nom ou la description
-    const filteredRecipes = useMemo(() => {
-        const cleanSearch = searchedTerm.trim().toLowerCase();
-        return recipes.filter((recipe) => {
-            const matchesSearch = recipe.name?.toLowerCase().includes(cleanSearch);
-            const matchesDescription = recipe.description?.toLowerCase().includes(cleanSearch);
-            return matchesSearch || matchesDescription;
-        });
-    }, [recipes, searchedTerm]);
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">Mes Recettes</h1>
+  const toggleTag = (tagId) => {
+    setSelectedTagIds((current) =>
+      current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId],
+    )
+  }
 
-            <p>Filtres des recettes.</p>
-            <p>{tags.map(tag => {
-                <p>{tag.name}</p>
-            })}</p>
-            <input type="text" value={searchedTerm} placeholder="Recherche ..." onChange={(text) => setSearchedTerm(text.target.value)} className="w-full pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#10a34a]/20 focus:border-[#10a34a] transition-all" />
+  // Search matches the name or the description; tags narrow it further, a
+  // recipe having to carry every tag picked.
+  const filteredRecipes = useMemo(() => {
+    const cleanSearch = searchedTerm.trim().toLowerCase()
 
+    return recipes.filter((recipe) => {
+      const matchesSearch =
+        cleanSearch === '' ||
+        recipe.name?.toLowerCase().includes(cleanSearch) ||
+        recipe.description?.toLowerCase().includes(cleanSearch)
 
-            {filteredRecipes.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-                    {filteredRecipes.map((recipe) => (
-                        <RecipeCard key={recipe.id} recipe={recipe} />
-                    ))}
-                </div>
-            ) : (
-                <p className="text-gray-500 text-center py-10">
-                    Aucune recette n'a été trouvée.
-                </p>
-            )}
+      const recipeTagIds = (recipe.tags ?? []).map((tag) => tag.id)
+      const matchesTags = selectedTagIds.every((id) => recipeTagIds.includes(id))
+
+      return matchesSearch && matchesTags
+    })
+  }, [recipes, searchedTerm, selectedTagIds])
+
+  // Only the tags actually carried by the user's recipes are worth offering:
+  // the full list is ~50 entries and most would filter down to nothing.
+  const availableTags = useMemo(() => {
+    const usedTagIds = new Set(recipes.flatMap((recipe) => (recipe.tags ?? []).map((tag) => tag.id)))
+    return tags.filter((tag) => usedTagIds.has(tag.id))
+  }, [tags, recipes])
+
+  return (
+    <section className="border-b border-line px-6 py-14 sm:px-10 sm:py-16 lg:px-16">
+      <Reveal as="h1" className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+        Mes recettes
+      </Reveal>
+
+      <Reveal delay={80} className="mt-8 max-w-xl">
+        <label htmlFor="recipe-search" className="sr-only">
+          Rechercher une recette
+        </label>
+        <input
+          id="recipe-search"
+          type="search"
+          value={searchedTerm}
+          placeholder="Rechercher une recette..."
+          onChange={(event) => setSearchedTerm(event.target.value)}
+          className="w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink transition-all focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+        />
+      </Reveal>
+
+      {availableTags.length > 0 && (
+        <Reveal delay={160} className="mt-5 flex flex-wrap gap-2">
+          {availableTags.map((tag) => {
+            const active = selectedTagIds.includes(tag.id)
+
+            return (
+              <button
+                key={tag.id}
+                type="button"
+                onClick={() => toggleTag(tag.id)}
+                aria-pressed={active}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  active
+                    ? 'border-brand bg-brand text-white'
+                    : 'border-line bg-white text-muted hover:border-brand/40 hover:text-ink'
+                }`}
+              >
+                {capitalize(tag.name)}
+              </button>
+            )
+          })}
+        </Reveal>
+      )}
+
+      {filteredRecipes.length > 0 ? (
+        <div className="mt-10 grid justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredRecipes.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))}
         </div>
-    );
+      ) : (
+        <p className="mt-10 text-center text-sm text-muted">Aucune recette n&apos;a été trouvée.</p>
+      )}
+    </section>
+  )
 }
