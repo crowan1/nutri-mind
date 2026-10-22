@@ -27,4 +27,67 @@
       translate: 0 -0.4rem;
     }
   }
+
+  /* Sweep used by the skeleton placeholders. The gradient is three times the
+     width of its box, so sliding it across reads as a highlight passing over
+     the block rather than a colour change. */
+  --animate-shimmer: shimmer 1.8s ease-in-out infinite;
+
+  @keyframes shimmer {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -150% 0;
+    }
+  }
+
+  /* The preloader builds its wordmark letter by letter: each one starts
+     offset, tilted and small, then lands. The travel is carried by custom
+     properties so a single keyframe serves every letter and the scatter stays
+     art-directable from the component. */
+  --animate-letter-in: letter-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes letter-in {
+    from {
+      opacity: 0;
+      translate: var(--letter-x) var(--letter-y);
+      rotate: var(--letter-r);
+      scale: 0.55;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+      rotate: 0deg;
+      scale: 1;
+    }
+  }
+
+  /* The mark lands after the last letter, overshooting slightly so it reads as
+     a drop rather than a fade. */
+  --animate-mark-in: mark-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes mark-in {
+    from {
+      opacity: 0;
+      translate: 0 -1.5rem;
+      scale: 0.4;
+      rotate: -25deg;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+}
+
+/* The router paints nothing until the opening session check lands, and the
+   preloader holds back its own 220 ms. The body carries the app's colour so
+   that gap is a calm cream rather than a flash of browser white. */
+@layer base {
+  body {
+    background-color: var(--color-page);
+  }
 }
