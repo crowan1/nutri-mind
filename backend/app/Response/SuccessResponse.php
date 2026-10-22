@@ -9,7 +9,7 @@ class SuccessResponse
     public string $data;
     public bool $success;
 
-    public function __construct(int $code = 200, string $message, string $data)
+    public function __construct(int $code, string $message, string $data)
     {
         $this->code = $code;
         $this->message = $message;
@@ -24,6 +24,6 @@ class SuccessResponse
             'success' => $this->success,
             'message' => $this->message,
             'data' => json_decode($this->data)
-        ]);
+        ], $this->code);
     }
 }

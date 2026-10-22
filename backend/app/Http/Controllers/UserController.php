@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Response\ErrorResponse;
 use App\Response\SuccessResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class UserController
@@ -16,18 +17,20 @@ class UserController
             $users = User::all();
             return new SuccessResponse(200, 'Users found successfully.', $users)->send();
         } catch (Throwable $e) {
-            return new ErrorResponse($e->getCode(), $e->getMessage())->send();
+            Log::error('getAllUsers failed', ['exception' => $e]);
+            return new ErrorResponse(500, 'Error while fetching users.')->send();
         }
     }
 
     public function getUserById(int $id)
     {
-        try {
-            $user = User::findOrFail($id);
-            return new SuccessResponse(200, 'User found successfully.', $user)->send();
-        } catch (Throwable $e) {
-            return new ErrorResponse($e->getCode(), $e->getMessage())->send();
+        $user = User::find($id);
+
+        if (!$user) {
+            return (new ErrorResponse(404, 'User not found.'))->send();
         }
+
+        return (new SuccessResponse(200, 'User found successfully.', $user))->send();
     }
 
     public function addUser(Request $request)
@@ -56,6 +59,7 @@ class UserController
 
             return (new SuccessResponse(201, 'User created successfully', $user))->send();
         } catch (Throwable $e) {
+            Log::error('addUser failed', ['exception' => $e]);
             return (new ErrorResponse(500, 'Error while creating user.'))->send();
         }
     }
@@ -66,6 +70,10 @@ class UserController
 
         if (!$user) {
             return (new ErrorResponse(404, 'User not found.'))->send();
+        }
+
+        if ($request->user()->id !== $user->id) {
+            return (new ErrorResponse(403, 'You can only edit your own account.'))->send();
         }
 
         $validated = $request->validate(
@@ -82,36 +90,27 @@ class UserController
             ]
         );
 
-        try {
-            if (isset($validated['password'])) {
-                $validated['password'] = bcrypt($validated['password']);
-            }
+        // password_validation only exists to compare the two inputs, it is not
+        // a column: dropping it keeps the mass update clean.
+        unset($validated['password_validation']);
 
+        if (empty($validated['password'])) {
+            unset($validated['password']);
+        } else {
+            $validated['password'] = bcrypt($validated['password']);
+        }
+
+        try {
             $user->update($validated);
 
             return (new SuccessResponse(200, 'User updated successfully.', $user))->send();
         } catch (Throwable $e) {
+            Log::error('editUser failed', ['exception' => $e]);
             return (new ErrorResponse(500, 'Error while updating user.'))->send();
         }
     }
 
-    public function deleteUser(int $id)
-    {
-        $user = User::with('tags')->find($id);
-
-        if (!$user) {
-            return (new ErrorResponse(404, 'User not found.'))->send();
-        }
-
-        try {
-            $user->delete();
-            return (new SuccessResponse(200, 'User deleted successfully.', $user))->send();
-        } catch (Throwable $e) {
-            return (new ErrorResponse(500, 'Error while deleting user.'))->send();
-        }
-    }
-
-    public function getRecipes(int $id)
+    public function deleteUser(Request $request, int $id)
     {
         $user = User::find($id);
 
@@ -119,11 +118,37 @@ class UserController
             return (new ErrorResponse(404, 'User not found.'))->send();
         }
 
+        if ($request->user()->id !== $user->id) {
+            return (new ErrorResponse(403, 'You can only delete your own account.'))->send();
+        }
+
+        try {
+            $user->delete();
+            return (new SuccessResponse(200, 'User deleted successfully.', $user))->send();
+        } catch (Throwable $e) {
+            Log::error('deleteUser failed', ['exception' => $e]);
+            return (new ErrorResponse(500, 'Error while deleting user.'))->send();
+        }
+    }
+
+    public function getRecipes(Request $request, int $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return (new ErrorResponse(404, 'User not found.'))->send();
+        }
+
+        if ($request->user()->id !== $user->id) {
+            return (new ErrorResponse(403, 'You can only list your own recipes.'))->send();
+        }
+
         try {
             $recipes = $user->recipes()->with('tags')->get();
             return (new SuccessResponse(200, 'Recipes found successfully.', $recipes))->send();
         } catch (Throwable $e) {
-            return (new ErrorResponse($e->getCode(), $e->getMessage()))->send();
+            Log::error('getRecipes failed', ['exception' => $e]);
+            return (new ErrorResponse(500, 'Error while fetching recipes.'))->send();
         }
     }
 }

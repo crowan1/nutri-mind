@@ -8,7 +8,7 @@ class ErrorResponse
     public int $code;
     public bool $success;
 
-    public function __construct(int $code = 500, string $message)
+    public function __construct(int $code, string $message)
     {
         $this->code = $code;
         $this->message = $message;
@@ -17,10 +17,15 @@ class ErrorResponse
 
     public function send()
     {
+        // Exception codes are not HTTP statuses: PDO reports strings, most
+        // others report 0. Anything out of range falls back to a plain 500 so
+        // response()->json() does not blow up on an invalid status.
+        $status = $this->code >= 100 && $this->code <= 599 ? $this->code : 500;
+
         return response()->json([
-            'code' => $this->code,
+            'code' => $status,
             'success' => $this->success,
             'message' => $this->message,
-        ]);
+        ], $status);
     }
 }

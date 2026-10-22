@@ -15,6 +15,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthenticatedSessionController::class, 'store']);
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
     Route::post('/reset-password', [NewPasswordController::class, 'store']);
+
+    // Second entry point for account creation, kept for the API consumers that
+    // do not go through the Breeze register flow.
+    Route::post('/users', [UserController::class, 'addUser']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -23,24 +27,19 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+
+    Route::get('/users', [UserController::class, 'getAllUsers']);
+    Route::get('/user/{id}', [UserController::class, 'getUserById']);
+    Route::put('/user/{id}', [UserController::class, 'editUser']);
+    Route::delete('/user/{id}', [UserController::class, 'deleteUser']);
+    Route::get('/user/{id}/recipes', [UserController::class, 'getRecipes']);
+
+    Route::get('/recipes', [RecipeController::class, 'getAllRecipes']);
+    Route::get('/recipe/{id}', [RecipeController::class, 'getRecipeById']);
+    Route::post('/recipes', [RecipeController::class, 'addRecipe']);
+    Route::put('/recipe/{id}', [RecipeController::class, 'editRecipe']);
+    Route::delete('/recipe/{id}', [RecipeController::class, 'deleteRecipe']);
+
+    Route::get('/tags', [TagController::class, 'getAllTags']);
+    Route::get('/tag/{id}', [TagController::class, 'getTagById']);
 });
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/users', [UserController::class, 'getAllUsers']);
-Route::get('/user/{id}', [UserController::class, 'getUserById']);
-Route::post('/users', [UserController::class, 'addUser']);
-Route::put('/user/{id}', [UserController::class, 'editUser']);
-Route::delete('/user/{id}', [UserController::class, 'deleteUser']);
-Route::get('/user/{id}/recipes', [UserController::class, 'getRecipes']);
-
-Route::get('/recipes', [RecipeController::class, 'getAllRecipes']);
-Route::get('/recipe/{id}', [RecipeController::class, 'getRecipeById']);
-Route::post('/recipes', [RecipeController::class, 'addRecipe']);
-Route::put('/recipe/{id}', [RecipeController::class, 'editRecipe']);
-Route::delete('/recipe/{id}', [RecipeController::class, 'deleteRecipe']);
-
-Route::get('/tags', [TagController::class, 'getAllTags']);
-Route::get('/tag/{id}', [TagController::class, 'getTagById']);

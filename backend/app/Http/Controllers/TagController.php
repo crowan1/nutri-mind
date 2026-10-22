@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use App\Response\ErrorResponse;
 use App\Response\SuccessResponse;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class TagController extends Controller
+class TagController
 {
     public function getAllTags()
     {
@@ -16,17 +16,19 @@ class TagController extends Controller
             $tags = Tag::all();
             return new SuccessResponse(200, 'Tags found successfully.', $tags)->send();
         } catch (Throwable $e) {
-            return new ErrorResponse($e->getCode(), $e->getMessage())->send();
+            Log::error('getAllTags failed', ['exception' => $e]);
+            return new ErrorResponse(500, 'Error while fetching tags.')->send();
         }
     }
 
     public function getTagById(int $id)
     {
-        try {
-            $tag = Tag::findOrFail($id);
-            return new SuccessResponse(200, 'Tag found successfully.', $tag)->send();
-        } catch (Throwable $e) {
-            return new ErrorResponse($e->getCode(), $e->getMessage())->send();
+        $tag = Tag::find($id);
+
+        if (!$tag) {
+            return (new ErrorResponse(404, 'Tag not found.'))->send();
         }
+
+        return (new SuccessResponse(200, 'Tag found successfully.', $tag))->send();
     }
 }
