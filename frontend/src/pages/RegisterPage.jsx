@@ -12,7 +12,7 @@ export default function RegisterPage() {
   usePageTitle('Inscription')
 
   const navigate = useNavigate()
-  const { signIn } = useAuth()
+  const { signIn, runTransition } = useAuth()
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -34,9 +34,13 @@ export default function RegisterPage() {
     setErrors({})
 
     try {
-      const { user } = await register(form)
-      signIn(user)
-      navigate(routes.dashboard)
+      // The whole trip runs under the preloader: request, sign-in and redirect.
+      // It therefore lifts on a mounted dashboard rather than on the form.
+      await runTransition(async () => {
+        const { user } = await register(form)
+        signIn(user)
+        navigate(routes.dashboard)
+      })
     } catch (error) {
       setErrors(error.errors ?? { email: error.message ?? 'Une erreur est survenue.' })
     } finally {
