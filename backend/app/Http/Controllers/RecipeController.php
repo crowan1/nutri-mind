@@ -24,7 +24,8 @@ class RecipeController
 
     public function getRecipeById(int $id)
     {
-        $recipe = Recipe::with('tags')->find($id);
+        $recipe = Recipe::with(['tags', 'recipeIngredients.ingredient', 'recipeIngredients.unit'])
+            ->find($id);
 
         if (!$recipe) {
             return (new ErrorResponse(404, 'Recipe not found.'))->send();

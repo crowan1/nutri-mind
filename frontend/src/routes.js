@@ -12,6 +12,7 @@ export const routes = {
   features: '/features',
   inventory: '/inventory',
   recipes: '/recipes',
+  recipeDetail: '/recipes/:id',
   pricing: '/pricing',
 
   // Ressources
@@ -29,3 +30,7 @@ export const routes = {
   privacy: '/privacy',
   terms: '/terms',
 }
+
+// Parameterised paths are declared as patterns above so <Route> can match
+// them; links go through a builder rather than concatenating the id by hand.
+export const recipePath = (id) => `/recipes/${id}`

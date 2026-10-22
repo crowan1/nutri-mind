@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import RecipeCard from '../components/recipes/RecipeCard'
 import Reveal from '../components/Reveal'
 import { useAuth } from '../context/AuthContext'
 import { fetchTags, fetchUserRecipes } from '../lib/api'
+import { recipePath } from '../routes'
 import usePageTitle from '../usePageTitle'
 import { capitalize } from '../utils/Format'
 import { showErrorToast } from '../utils/Toast'
@@ -12,6 +14,7 @@ export default function RecipesPage() {
   usePageTitle('Mes recettes')
 
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [recipes, setRecipes] = useState([])
   const [tags, setTags] = useState([])
@@ -132,7 +135,11 @@ export default function RecipesPage() {
       {filteredRecipes.length > 0 ? (
         <div className="mt-10 grid justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              onViewClick={() => navigate(recipePath(recipe.id))}
+            />
           ))}
         </div>
       ) : (

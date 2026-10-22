@@ -78,3 +78,7 @@ export async function fetchUserRecipes(userId) {
 export async function fetchTags() {
   return request('/tags')
 }
+
+export async function fetchRecipe(id) {
+  return request(`/recipe/${id}`)
+}
