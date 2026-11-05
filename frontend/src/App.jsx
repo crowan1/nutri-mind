@@ -14,6 +14,7 @@ import LegalPage from './pages/LegalPage'
 import LoginPage from './pages/LoginPage'
 import NotFoundPage from './pages/NotFoundPage'
 import PrivacyPage from './pages/PrivacyPage'
+import ProfilePage from './pages/ProfilePage'
 import RecipeDetailPage from './pages/RecipeDetailPage'
 import RecipesPage from './pages/RecipesPage'
 import RegisterPage from './pages/RegisterPage'
@@ -60,6 +61,7 @@ export default function App() {
               <Route path={routes.dashboard} element={<DashboardPage />} />
               <Route path={routes.recipes} element={<RecipesPage />} />
               <Route path={routes.recipeDetail} element={<RecipeDetailPage />} />
+              <Route path={routes.profile} element={<ProfilePage />} />
 
               <Route
                 path={routes.inventory}
@@ -85,15 +87,6 @@ export default function App() {
                   <ComingSoonPage
                     title="Forme"
                     detail="Le suivi nutritionnel nécessite des données de composition sur les ingrédients, pas encore stockées."
-                  />
-                }
-              />
-              <Route
-                path={routes.profile}
-                element={
-                  <ComingSoonPage
-                    title="Profil"
-                    detail="L'API expose déjà la modification du compte : cet écran reste à construire."
                   />
                 }
               />

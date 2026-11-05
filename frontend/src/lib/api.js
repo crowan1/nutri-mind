@@ -71,6 +71,18 @@ export async function sendPasswordResetLink(email) {
   })
 }
 
+export async function fetchProfile() {
+  return request('/profile')
+}
+
+export async function updateProfile(changes) {
+  await ensureCsrfCookie()
+  return request('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(changes),
+  })
+}
+
 export async function fetchUserRecipes(userId) {
   return request(`/user/${userId}/recipes`)
 }
