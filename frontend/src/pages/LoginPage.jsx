@@ -4,9 +4,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import AuthField from '../components/AuthField'
 import AuthLayout from '../components/AuthLayout'
 import { useAuth } from '../context/AuthContext'
-import { login } from '../lib/api'
+import { firstErrorMessage, login } from '../lib/api'
 import { routes } from '../routes'
 import usePageTitle from '../usePageTitle'
+import { showErrorToast } from '../utils/Toast'
 
 export default function LoginPage() {
   usePageTitle('Connexion')
@@ -16,6 +17,11 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+
+  // Nothing to send until both are filled, and a request that can only come
+  // back as a validation error is a round trip spent to tell the user what the
+  // form already knows.
+  const incomplete = !form.email.trim() || !form.password
 
   function updateField(field) {
     return (event) => {
@@ -38,7 +44,13 @@ export default function LoginPage() {
         navigate(routes.dashboard)
       })
     } catch (error) {
-      setErrors(error.errors ?? { email: error.message ?? 'Une erreur est survenue.' })
+      const message = firstErrorMessage(error)
+
+      // Both, not one or the other: the toast is what the eye catches when the
+      // button was the last thing looked at, and the inline message is what
+      // stays next to the field once the toast has gone.
+      setErrors(error.errors ?? { email: message })
+      showErrorToast(message)
     } finally {
       setSubmitting(false)
     }
@@ -51,7 +63,7 @@ export default function LoginPage() {
         Connectez-vous à l&apos;aide de votre adresse e-mail et votre mot de passe.
       </p>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="mt-8 flex flex-1 flex-col gap-5" onSubmit={handleSubmit} noValidate>
         <AuthField
           id="email"
           label="Adresse e-mail"
@@ -76,12 +88,10 @@ export default function LoginPage() {
           required
         />
 
-        <div className="hidden h-[5.25rem] lg:block" aria-hidden="true" />
-
         <button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-brand px-4 py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={submitting || incomplete}
+          className="mt-auto w-full rounded-lg bg-brand px-4 py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? 'Connexion...' : 'Se connecter'}
         </button>

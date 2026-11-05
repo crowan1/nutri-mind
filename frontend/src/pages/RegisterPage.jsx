@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import AuthField from '../components/AuthField'
 import AuthLayout from '../components/AuthLayout'
 import { useAuth } from '../context/AuthContext'
-import { register } from '../lib/api'
+import { firstErrorMessage, register } from '../lib/api'
 import { routes } from '../routes'
 import usePageTitle from '../usePageTitle'
+import { showErrorToast } from '../utils/Toast'
 
 export default function RegisterPage() {
   usePageTitle('Inscription')
@@ -20,6 +21,11 @@ export default function RegisterPage() {
   })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+
+  // Nothing to send until the three are filled, and a request that can only
+  // come back as a validation error is a round trip spent to tell the user
+  // what the form already knows.
+  const incomplete = !form.email.trim() || !form.password || !form.password_confirmation
 
   function updateField(field) {
     return (event) => {
@@ -42,7 +48,13 @@ export default function RegisterPage() {
         navigate(routes.dashboard)
       })
     } catch (error) {
-      setErrors(error.errors ?? { email: error.message ?? 'Une erreur est survenue.' })
+      const message = firstErrorMessage(error)
+
+      // Both, not one or the other: the toast is what the eye catches when the
+      // button was the last thing looked at, and the inline message is what
+      // stays next to the field once the toast has gone.
+      setErrors(error.errors ?? { email: message })
+      showErrorToast(message)
     } finally {
       setSubmitting(false)
     }
@@ -55,7 +67,7 @@ export default function RegisterPage() {
         Inscrivez-vous à l&apos;aide de votre adresse e-mail et votre mot de passe.
       </p>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="mt-8 flex flex-1 flex-col gap-5" onSubmit={handleSubmit} noValidate>
         <AuthField
           id="email"
           label="Adresse e-mail"
@@ -94,16 +106,12 @@ export default function RegisterPage() {
 
         <button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-brand px-4 py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={submitting || incomplete}
+          className="mt-auto w-full rounded-lg bg-brand px-4 py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? 'Inscription...' : "S'inscrire"}
         </button>
       </form>
-
-      <p className="mt-6 text-center text-sm text-muted invisible" aria-hidden="true">
-        Mot de passe oublié ?
-      </p>
     </AuthLayout>
   )
 }

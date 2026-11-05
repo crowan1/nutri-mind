@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom'
 
 import AuthField from '../components/AuthField'
 import AuthLayout from '../components/AuthLayout'
-import { sendPasswordResetLink } from '../lib/api'
+import { firstErrorMessage, sendPasswordResetLink } from '../lib/api'
 import { routes } from '../routes'
 import usePageTitle from '../usePageTitle'
+import { showErrorToast } from '../utils/Toast'
 
 export default function ForgotPasswordPage() {
   usePageTitle('Mot de passe oublié')
@@ -25,7 +26,10 @@ export default function ForgotPasswordPage() {
       const response = await sendPasswordResetLink(email)
       setMessage(response.message)
     } catch (error) {
-      setErrors(error.errors ?? { email: error.message ?? 'Une erreur est survenue.' })
+      const failure = firstErrorMessage(error)
+
+      setErrors(error.errors ?? { email: failure })
+      showErrorToast(failure)
     } finally {
       setSubmitting(false)
     }
@@ -38,7 +42,7 @@ export default function ForgotPasswordPage() {
         Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.
       </p>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="mt-8 flex flex-1 flex-col gap-5" onSubmit={handleSubmit} noValidate>
         <AuthField
           id="email"
           label="Adresse e-mail"
@@ -58,8 +62,8 @@ export default function ForgotPasswordPage() {
 
         <button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-brand px-4 py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={submitting || !email.trim()}
+          className="mt-auto w-full rounded-lg bg-brand px-4 py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? 'Envoi...' : 'Envoyer le lien'}
         </button>
