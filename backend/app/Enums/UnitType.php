@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasValues;
+
 enum UnitType: string
 {
+    use HasValues;
+
     case GRAM = 'g';
     case KILOGRAM = 'kg';
     case MILLIGRAM = 'mg';
@@ -39,9 +43,4 @@ enum UnitType: string
     case HANDFUL = 'poignée';
     case ZEST = 'zeste';
     case JUICE = 'jus';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }

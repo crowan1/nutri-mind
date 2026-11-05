@@ -24,6 +24,8 @@ class RegisteredUserController extends Controller
             'password' => bcrypt($validated['password']),
         ]);
 
+        $user->ensureProfile();
+
         Auth::login($user);
 
         $request->session()->regenerate();

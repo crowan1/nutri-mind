@@ -10,6 +10,7 @@ use App\Models\RecipeIngredient;
 use App\Models\Tag;
 use App\Models\Unit;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -23,6 +24,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $users = User::factory(10)->create();
+
+        // One row each rather than a recycled pool: user_id is unique on
+        // user_profiles, so a second profile for the same user would fail.
+        $users->each(fn (User $user) => UserProfile::factory()->for($user)->create());
 
         $allUnits = UnitType::values();
         $units = Unit::factory()->count(count($allUnits))->sequence(...array_map(fn($name) => ['name' => $name], $allUnits))->create();

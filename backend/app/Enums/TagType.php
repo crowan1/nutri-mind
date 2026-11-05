@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Enums\Concerns\HasValues;
+
 enum TagType: string
 {
+    use HasValues;
+
     // Types de repas & rôles
     case STARTER = 'entrée';
     case MAIN_DISHP = 'plat';
@@ -70,9 +74,4 @@ enum TagType: string
     case SAVORY = 'salé';
     case SWEET_SAVORY = 'sucré-salé';
     case SPICY = 'épicé';
-
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
 }

@@ -57,6 +57,8 @@ class UserController
                 'password' => bcrypt($validated['password'])
             ]);
 
+            $user->ensureProfile();
+
             return (new SuccessResponse(201, 'User created successfully', $user))->send();
         } catch (Throwable $e) {
             Log::error('addUser failed', ['exception' => $e]);
