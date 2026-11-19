@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['first_name', 'last_name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 #[UseModel(User::class)]
 class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     public function recipes(): HasMany {
         return $this->hasMany(Recipe::class);

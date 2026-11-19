@@ -97,4 +97,24 @@ class ProfileTest extends TestCase
             ->assertOk()
             ->assertJsonPath('profile.cooking_level', 'advanced');
     }
+
+    // Registration leaves last_name empty for an address with no dot in it, and
+    // ConvertEmptyStringsToNull turns that back into null on the way in. Those
+    // accounts could not save their profile at all until the rules allowed it.
+    public function test_an_account_with_no_surname_can_still_save_its_profile(): void
+    {
+        $user = User::factory()->create(['first_name' => 'a', 'last_name' => '']);
+
+        $this->actingAs($user)
+            ->putJson('/api/profile', [
+                'first_name' => 'a',
+                'last_name' => '',
+                'email' => $user->email,
+                'height_cm' => 178,
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'last_name' => '']);
+        $this->assertDatabaseHas('user_profiles', ['user_id' => $user->id, 'height_cm' => 178]);
+    }
 }

@@ -42,6 +42,8 @@ class ProfileController
         $user = $request->user();
 
         $validated = $request->validate($this->rules($user->id), [
+            'first_name.max' => 'Le prénom ne peut pas dépasser 100 caractères.',
+            'last_name.max' => 'Le nom ne peut pas dépasser 100 caractères.',
             'email.unique' => 'Cet email est déjà utilisé.',
             'target_weight_kg.max' => 'Un objectif au-delà de 400 kg est sûrement une faute de frappe.',
         ]);
@@ -49,7 +51,17 @@ class ProfileController
         try {
             $profile = $user->ensureProfile();
 
-            $user->update(array_intersect_key($validated, array_flip(self::ACCOUNT_FIELDS)));
+            $account = array_intersect_key($validated, array_flip(self::ACCOUNT_FIELDS));
+
+            // The columns are NOT NULL, so the null the rules now tolerate has
+            // to come back down to the empty string before it is written.
+            foreach (['first_name', 'last_name'] as $field) {
+                if (array_key_exists($field, $account) && $account[$field] === null) {
+                    $account[$field] = '';
+                }
+            }
+
+            $user->update($account);
             $profile->update(array_diff_key($validated, array_flip(self::ACCOUNT_FIELDS)));
 
             // `update` writes the models in place but leaves the loaded
@@ -70,8 +82,13 @@ class ProfileController
     private function rules(int $userId): array
     {
         return [
-            'first_name' => ['sometimes', 'string', 'max:100'],
-            'last_name' => ['sometimes', 'string', 'max:100'],
+            // Nullable, not because the columns accept null, but because
+            // ConvertEmptyStringsToNull gets there first: a surname left empty
+            // arrives as null, and `string` alone would reject it. Registration
+            // leaves last_name empty for any address without a dot, so without
+            // this those accounts can never save their profile at all.
+            'first_name' => ['sometimes', 'nullable', 'string', 'max:100'],
+            'last_name' => ['sometimes', 'nullable', 'string', 'max:100'],
             'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($userId)],
 
             // A birth date in the future, or one that would make the user 120,
