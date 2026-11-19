@@ -3,12 +3,19 @@ import Reveal from '../Reveal'
 // One titled block of the profile form. Every section looks the same on
 // purpose: an icon, a heading, a line saying what the setting actually
 // changes, then the controls.
-export default function ProfileCard({ icon: Icon, title, description, delay = 0, children }) {
+export default function ProfileCard({
+  icon: Icon,
+  title,
+  description,
+  delay = 0,
+  className = '',
+  children,
+}) {
   return (
     <Reveal
       as="section"
       delay={delay}
-      className="rounded-2xl border border-line bg-white p-5 sm:p-6"
+      className={`rounded-2xl border border-line bg-white p-5 sm:p-6 ${className}`}
     >
       <div className="flex items-start gap-3.5">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">

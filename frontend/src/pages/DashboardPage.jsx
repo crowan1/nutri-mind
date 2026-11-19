@@ -25,13 +25,13 @@ const ALERTS = [
     tone: 'bg-amber-50',
     dot: 'bg-amber-200',
     title: '2 produits à consommer rapidement',
-    lines: ['Lait — expire dans 2 jours', 'Yaourt nature — expire demain'],
+    lines: ['Lait : expire dans 2 jours', 'Yaourt nature : expire demain'],
   },
   {
     tone: 'bg-mint',
     dot: 'bg-line',
     title: '1 produit est périmé',
-    lines: ['Œufs — expiré depuis 2 jours'],
+    lines: ['Œufs : expiré depuis 2 jours'],
   },
 ]
 

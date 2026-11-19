@@ -316,7 +316,7 @@ export default function ProfilePage() {
                 { value: '2%', label: 'Taux de gaspillage' },
                 { value: '38 €', label: 'Économisés ce mois' },
                 {
-                  value: recipeCount === null ? '—' : recipeCount,
+                  value: recipeCount === null ? '…' : recipeCount,
                   label: 'Recettes enregistrées',
                 },
               ].map(({ value, label }) => (
@@ -499,7 +499,7 @@ export default function ProfilePage() {
             <ProfileCard
               icon={LeafIcon}
               title="Régime alimentaire"
-              description="Choisissez votre régime principal — il filtre toutes vos recettes."
+              description="Choisissez votre régime principal : il filtre toutes vos recettes."
             >
               <ChipGroup
                 label="Régime alimentaire"
@@ -512,7 +512,7 @@ export default function ProfilePage() {
             <ProfileCard
               icon={AlertIcon}
               title="Allergies & intolérances"
-              description="Sélectionnez vos allergènes — ils seront exclus de vos suggestions."
+              description="Sélectionnez vos allergènes : ils seront exclus de vos suggestions."
             >
               <ChipGroup
                 label="Allergies et intolérances"
@@ -624,10 +624,15 @@ export default function ProfilePage() {
               </div>
             </ProfileCard>
 
+            {/* The bottom padding is the room the save bar floats over. It is
+                spelled at both breakpoints because the card's own sm:p-6 is a
+                variant, and Tailwind emits variants after base utilities: a
+                bare pb-* would lose to it from sm up. */}
             <ProfileCard
               icon={TrophyIcon}
               title="Historique & badges"
               description="Vos paliers anti-gaspi et votre progression au fil du temps."
+              className="pb-28 sm:pb-32"
             >
               <BadgeBoard />
             </ProfileCard>
@@ -637,10 +642,20 @@ export default function ProfilePage() {
                 from most of it. Frosted rather than solid so the section it
                 covers stays legible underneath — the bar has to read as
                 floating above the form, not as a slice cut out of it. The
-                opaque background is the base and the translucent one is the
-                upgrade: a browser without backdrop-filter would otherwise be
-                left with unreadable text over the content. */}
-            <div className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/95 px-5 py-4 shadow-[0_10px_36px_rgba(20,20,15,0.14),inset_0_1px_0_rgba(255,255,255,0.95)] ring-1 ring-white/40 supports-backdrop-filter:bg-linear-to-br supports-backdrop-filter:from-white/40 supports-backdrop-filter:to-brand-soft/25 supports-backdrop-filter:backdrop-blur-2xl supports-backdrop-filter:backdrop-saturate-200">
+                opaque background is for browsers without backdrop-filter,
+                which would otherwise be left with unreadable text over the
+                content. The two are mutually exclusive on purpose: a colour
+                sitting under the translucent one is painted through it, and an
+                opaque one there makes the whole pane opaque however low the
+                alpha above it goes.
+
+                The negative margin is what makes the glass worth having: as
+                the last element of the column the bar came to rest after the
+                final card, with only the page behind it and so nothing for the
+                blur to show. Pulled up, it floats over that card's reserved
+                bottom padding instead, and there is a surface behind it at
+                every scroll position. */}
+            <div className="sticky bottom-4 z-10 -mt-24 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/60 px-5 py-4 shadow-[0_12px_40px_rgba(20,20,15,0.16),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(255,255,255,0.35)] not-supports-backdrop-filter:bg-white/95 supports-backdrop-filter:bg-linear-to-b supports-backdrop-filter:from-white/35 supports-backdrop-filter:to-white/5 supports-backdrop-filter:backdrop-blur-2xl supports-backdrop-filter:backdrop-saturate-200 supports-backdrop-filter:backdrop-brightness-105">
               <p aria-live="polite" className="text-xs text-muted">
                 {saving
                   ? 'Enregistrement en cours...'

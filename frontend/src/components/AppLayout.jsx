@@ -68,7 +68,7 @@ export default function AppLayout() {
 
           <div className="mt-auto hidden px-4 pb-4 lg:block">
             <p className="rounded-2xl bg-mint px-4 py-4 text-xs leading-relaxed text-muted">
-              <span className="font-semibold text-ink">Astuce</span> — Consultez vos recettes
+              <span className="font-semibold text-ink">Astuce</span> : consultez vos recettes
               suggérées pour utiliser vos produits bientôt périmés.
             </p>
           </div>

@@ -1,3 +1,5 @@
+import { FieldLabel } from './Field'
+
 // Small integer picked with two buttons. A number input would work, but the
 // household size is read and nudged far more often than it is typed, and the
 // spinner arrows are tiny targets.
@@ -6,14 +8,12 @@ export default function Stepper({ id, label, value, min = 1, max = 20, onChange 
 
   return (
     <div>
-      <span id={id} className="block text-xs font-medium text-ink">
-        {label}
-      </span>
+      <FieldLabel as="span" id={id} label={label} />
 
       <div
         role="group"
         aria-labelledby={id}
-        className="mt-2 inline-flex items-center gap-1 rounded-xl border border-line bg-white p-1"
+        className="mt-1.5 inline-flex items-center gap-1 rounded-xl border border-line bg-white p-1"
       >
         <button
           type="button"
